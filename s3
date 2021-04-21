@@ -1,0 +1,49 @@
+const AWS = require("aws-sdk");
+const ID = process.env.AWSAccessKeyId;
+const SECRET = process.env.AWSSecretKey;
+const s3 = new AWS.S3({
+  accessKeyId: ID,
+  secretAccessKey: SECRET,
+});
+module.exports.createBucket = (BUCKET_NAME, region) => {
+  const params = {
+    Bucket: BUCKET_NAME,
+    CreateBucketConfiguration: {
+      // Set your region here
+      // "eu-west-1"
+      LocationConstraint: region,
+    },
+  };
+  s3.createBucket(params, function (err, data) {
+    if (err) console.log(err, err.stack);
+    else console.log("Bucket Created Successfully", data.Location);
+  });
+};
+module.exports.uploadFile = async (fileData) => {
+  // Setting up S3 upload parameters
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: fileData.filename, // File name you want to save as in S3
+    Body: fileData.buffer,
+  };
+  // Uploading files to the bucket
+  return new Promise((resolve, reject) => {
+    s3.upload(params, (err, data) => {
+      // must log if error
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.Location);
+      }
+    });
+  });
+};
+white_check_mark
+eyes
+raised_hands
+
+
+..........................................
+AWSAccessKeyId=AKIAUC6GVJ6H6RL5F2PS
+AWSSecretKey=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
+BUCKET_NAME=ihawk
